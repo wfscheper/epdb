@@ -99,6 +99,7 @@ class Epdb(pdb.Pdb):
         self._completer = erlcompleter and erlcompleter.ECompleter() or None
         self._oldHistory = []
         self.prompt = '(Epdb) '
+        self.silent_server = False
 
     def store_old_history(self):
         historyLen = self._readline.get_current_history_length()
@@ -145,7 +146,8 @@ class Epdb(pdb.Pdb):
         # if enabled, you can serve a epdb session.
         def serve(self, port=SERVE_PORT):
             if not Epdb._server:
-                print('Serving on port %s' % port)
+                if not self.silent_server:
+                    print('Serving on port %s' % port)
                 Epdb._server = epdb_server.InvertedTelnetServer(('', port))
                 Epdb._server.handle_request()
                 Epdb._port = port
@@ -156,7 +158,8 @@ class Epdb(pdb.Pdb):
         def serve_post_mortem(self, t, exc_type=None, exc_msg=None,
                               port=SERVE_PORT):
             if not Epdb._server:
-                print('Serving on port %s' % port)
+                if not self.silent_server:
+                    print('Serving on port %s' % port)
                 Epdb._server = epdb_server.InvertedTelnetServer(('', port))
                 Epdb._server.handle_request()
                 self.stdout = sys.stdout
@@ -1076,11 +1079,16 @@ def set_trace(marker='default'):
 st = set_trace
 
 if hasTelnet:
-    def serve(port=SERVE_PORT):
-        Epdb().serve(port)
+    def serve(port=SERVE_PORT, silent=False):
+        e = Epdb()
+        e.silent_server = silent
+        e.serve(port)
 
-    def serve_post_mortem(t, exc_type=None, exc_msg=None, port=SERVE_PORT):
-        Epdb().serve_post_mortem(t, exc_type, exc_msg, port)
+    def serve_post_mortem(t, exc_type=None, exc_msg=None, port=SERVE_PORT,
+                          silent=False):
+        e = Epdb()
+        e.silent_server = silent
+        e.serve_post_mortem(t, exc_type, exc_msg, port)
 
     def connect(host='localhost', port=SERVE_PORT):
         t = epdb_client.TelnetClient(host, port)

@@ -43,7 +43,7 @@ class TelnetClientTest(TestCase):
             cli.set_raw_mode()
         sock.sendall.assert_not_called()
         _tcgetattr.assert_called_with(fd)
-        exp_attr = newattr[:3] + [247]
+        exp_attr = newattr[:3] + [245]
         _tcsetattr.assert_called_once_with(fd, epdb_client.termios.TCSANOW,
                                            exp_attr)
         self.assertEquals([
