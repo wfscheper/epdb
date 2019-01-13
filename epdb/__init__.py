@@ -314,7 +314,7 @@ class Epdb(pdb.Pdb):
                 # function that can take one arg and return a bool
                 rv = (isinstance(cond, bool)) or bool(cond(1))
                 self.set_trace_cond(marker, cond)
-            except:
+            except:  # noqa
                 print(self._reprExc())
     do_tc = do_trace_cond
 
@@ -464,7 +464,7 @@ class Epdb(pdb.Pdb):
             try:
                 code = compile(cmd, '<stdin>', 'single')
                 exec(code, globals, locals)
-            except:
+            except:  # noqa
                 print(self._reprExc())
         finally:
             self.read_history()
@@ -505,7 +505,7 @@ class Epdb(pdb.Pdb):
         for (methodName, method) in methods:
             try:
                 self._define(method)
-            except:
+            except:  # noqa
                 if hasattr(obj, '__name__'):
                     prefix = obj.__name__
                 else:
@@ -538,7 +538,7 @@ class Epdb(pdb.Pdb):
             if fn is None:
                 return True, result
             return True, fn(result)
-        except:
+        except:  # noqa
             if printExc:
                 exc = self._reprExc()
                 print(exc)
