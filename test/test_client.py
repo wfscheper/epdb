@@ -23,6 +23,7 @@
 from __future__ import unicode_literals
 from unittest import TestCase
 import mock
+import sys
 
 from epdb import epdb_client
 
@@ -43,7 +44,12 @@ class TelnetClientTest(TestCase):
             cli.set_raw_mode()
         sock.sendall.assert_not_called()
         _tcgetattr.assert_called_with(fd)
-        exp_attr = newattr[:3] + [245]
+        exp_attr = newattr[:3]
+        # osx/bsd uses different values for the termios flags
+        if sys.platform == "darwin":
+            exp_attr += [247]
+        else:
+            exp_attr += [245]
         _tcsetattr.assert_called_once_with(fd, epdb_client.termios.TCSANOW,
                                            exp_attr)
         self.assertEqual([
